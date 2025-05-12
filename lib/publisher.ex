@@ -1,18 +1,26 @@
 defmodule Publisher do
   @moduledoc """
-  The fastest publisher in the land.
+  A module that provides a simple interface for publishing messages to RabbitMQ.
   """
 
-  @doc """
-  ## Examples
+  use GenServer
 
-      iex> Publisher.publish()
-      :ok
+  require Logger
 
-  """
-  def publish do
-    :telemetry.span([:candidate_rmq, :publish], %{start_meta: %{}}, fn ->
-      {:ok, %{end_meta: %{}}}
-    end)
+  # Client API
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  def publish(exchange, routing_key, payload, options \\ []) do
+    # TODO: implement this considering using poolboy
+  end
+
+  # Server callbacks
+
+  @impl true
+  def init(opts) do
+    # TODO: with the connection worker, we can use the connection pool
   end
 end
