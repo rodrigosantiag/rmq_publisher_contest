@@ -21,8 +21,9 @@ defmodule RmqPublisherContest.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:amqp, "~> 4.0"},
+      {:amqp, "~> 3.2"},
       {:jason, "~> 1.4"},
+      {:mimic, "~> 1.11", only: :test},
       {:poolboy, "~> 1.5"},
       {:telemetry, "~> 1.0"}
     ]

@@ -1,5 +1,4 @@
-defmodule ConnectionWorker do
-
+defmodule RmqPublisherContest.ConnectionWorker do
   use GenServer
   require Logger
 
@@ -57,7 +56,7 @@ defmodule ConnectionWorker do
   end
 
   @impl true
-  def handle_call(:DOWN, _ref, :process, _pid, _reason, state) do
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
     {:noreply, state}
   end
 
@@ -77,7 +76,7 @@ defmodule ConnectionWorker do
         {:noreply, %{state | conn: conn, channel: channel, ref: ref}}
 
       {:error, reason} ->
-        # Logger.error("Failed to connect to RabbitMQ: #{inspect(reason)}")
+        Logger.error("Failed to connect to RabbitMQ: #{inspect(reason)}")
         Process.send_after(self(), :connect, 5000)
         {:noreply, state}
     end
