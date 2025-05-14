@@ -73,3 +73,14 @@ You can also pass options directly when starting the publishers:
 {RmqPublisherContest.Publisher, [rabbit_url: "amqp://user:pass@rabbitmq.example.com"]}
 {RmqPublisherContest.PoolPublisher, [rabbit_url: "amqp://user:pass@rabbitmq.example.com", pool_size: 10]}
 ```
+
+### Running the Benchmark
+
+1. Make sure RabbitMQ is running and accessible with the configured URL
+
+2. Edit the benchmark file with your Rabbit MQ connection string and the name of the queue you want to use for testing
+
+3. Run the benchmark script:
+
+```bash
+mix run test/benchmark/benchmark.exs
