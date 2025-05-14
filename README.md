@@ -1,31 +1,75 @@
-# RmqPublisherContest
+# RMQ Publisher Contest
 
-Let the contest begin!
+I implemented two publishers to find the fastest and most reliable publisher implementation.
 
-We're asking for a brave volunteer to create the speediest RabbitMQ publisher.
+## Features
 
-Fork this repository to your personal GitHub account and begin building.
+- **Single-Connection Publisher**: Simple publisher with one connection
+- **Connection-Pooled Publisher**: More resilient with connection pool
+- **Auto-Reconnection**: Both handle connection failures
+- **Publisher Confirms**: For reliable message delivery
+- **Tests**: Unit tests with Mimic
 
-Feel free to add any extra telemetry data you'd like, using the prefix `:candidate_rmq`.
-Include tests, documentation, and any required configs.
-Please try and only spend a few hours on the solution, and if you can time how long the development takes that will be great info to include.
-Your solution will be graded on a matrix of payload size and concurrency, and pulled in as a github dependency to the grading framework.
-It will be tested on a M1 Macbook Pro and a local RabbitMQ instance.
+## Benchmark Results
 
-## Installation
+| Publisher | Messages/sec |
+|-----------|--------------|
+| Single | ~48000 |
+| Pool | ~30000 |
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `rmq_publisher_contest` to your list of dependencies in `mix.exs`:
+## Implementation
+
+### Single-Connection Publisher
+
+- One connection/channel for all messages
+- Good for higher performance
+- Auto-reconnects when connection fails
+
+### Connection-Pool Publisher
+
+- Multiple connections for better resilience
+- Uses poolboy for connection pool
+- Better when reliability is more important
+- Can scale with pool size config (on my computer the max pool size was 10. more than that it doesn't work)
+
+### Connection Worker
+
+- Manages individual RabbitMQ connections
+- Monitors connection state
+
+## Configuration
+
+In your `config.exs`:
 
 ```elixir
-def deps do
-  [
-    {:rmq_publisher_contest, "~> 0.1.0"}
+config :your_app, :rmq_publisher,
+  rabbit_url: "amqp://guest:guest@localhost",
+  pool_size: 5
+```
+
+## Usage in Your Application
+Add both publishers to your application's supervision tree:
+
+```elixir
+# In your application.ex
+def start(_type, _args) do
+  publisher_opts = Application.get_env(:your_app, :rmq_publisher, [])
+  
+  children = [
+    # ... your other children
+    {RmqPublisherContest.Publisher, publisher_opts},
+    {RmqPublisherContest.PoolPublisher, publisher_opts}
   ]
+
+  opts = [strategy: :one_for_one, name: YourApp.Supervisor]
+  Supervisor.start_link(children, opts)
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/rmq_publisher_contest>.
+You can also pass options directly when starting the publishers:
 
+```elixir
+# For custom options
+{RmqPublisherContest.Publisher, [rabbit_url: "amqp://user:pass@rabbitmq.example.com"]}
+{RmqPublisherContest.PoolPublisher, [rabbit_url: "amqp://user:pass@rabbitmq.example.com", pool_size: 10]}
+```
