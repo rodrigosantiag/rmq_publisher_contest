@@ -1,1 +1,8 @@
 ExUnit.start()
+Mimic.copy(:poolboy)
+Mimic.copy(AMQP.Connection)
+Mimic.copy(AMQP.Channel)
+Mimic.copy(AMQP.Confirm)
+Mimic.copy(AMQP.Basic)
+Mimic.copy(RmqPublisherContest.ConnectionWorker)
+Mimic.copy(Supervisor)

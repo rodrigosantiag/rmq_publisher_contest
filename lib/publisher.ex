@@ -55,7 +55,7 @@ defmodule RmqPublisherContest.Publisher do
 
   @impl true
   def handle_info({:DOWN, ref, :process, _pid, reason}, %{ref: ref} = state) do
-    # Logger.error("Connection to RabbitMQ lost: #{inspect(reason)}")
+    Logger.error("Connection to RabbitMQ lost: #{inspect(reason)}")
 
     if state.channel, do: safely_close_channel(state.channel)
 
@@ -87,7 +87,7 @@ defmodule RmqPublisherContest.Publisher do
         {:noreply, %{state | conn: conn, channel: channel, ref: ref}}
 
       {:error, reason} ->
-        # Logger.error("Failed to connect to RabbitMQ: #{inspect(reason)}")
+        Logger.error("Failed to connect to RabbitMQ: #{inspect(reason)}")
         Process.send_after(self(), :connect, 5000)
         {:noreply, state}
     end
